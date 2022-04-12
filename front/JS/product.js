@@ -3,8 +3,6 @@ let str = window.location.href;
 let url = new URL(str);
 let id = url.searchParams.get("id");
 
-console.log(id);
-
 //getting information from API with previously stored ID
 fetch(`http://localhost:3000/api/products/${id}`)
   .then(function (res) {
@@ -13,7 +11,6 @@ fetch(`http://localhost:3000/api/products/${id}`)
     }
   })
   .then(function (productData) {
-    console.log(productData);
     //create image element and adding alt information
     let newImg = document.createElement("img");
     newImg.setAttribute("src", `${productData.imageUrl}`);
@@ -41,3 +38,56 @@ fetch(`http://localhost:3000/api/products/${id}`)
   .catch(function (err) {
     //une erreur est survenue
   });
+
+//functions for localStorage
+function saveBasket(basket) {
+  localStorage.setItem("basket", JSON.stringify(basket));
+}
+function getBasket() {
+  let basket = localStorage.getItem("basket");
+  if (basket == null) {
+    return [];
+  } else {
+    return JSON.parse(basket);
+  }
+}
+
+function addBasket(product, quantity) {
+  let basket = getBasket();
+  //increment quantity of product if product already in basket else add the product to the basket
+  let foundProduct = basket.find(
+    (p) => p.id == product.id && p.color == product.color
+  );
+  if (foundProduct != undefined) {
+    foundProduct.quantity = +foundProduct.quantity + +quantity;
+  } else {
+    product.quantity = quantity;
+    basket.push(product);
+  }
+
+  saveBasket(basket);
+}
+//
+//Adding product to basket
+
+//adding product to localStorage on click event
+let addToCart = document.getElementById("addToCart");
+addToCart.addEventListener("click", function addToLocalStorage() {
+  //Getting values for color and item qty
+  let getColor = document.getElementById("colors").value;
+  let getQuantity = +document.getElementById("quantity").value;
+
+  console.log(id, getColor, getQuantity);
+  if (getColor != null && getQuantity > 0) {
+    addBasket(
+      {
+        id: `${id}`,
+        color: `${getColor}`,
+      },
+      `${getQuantity}`
+    );
+  } else {
+    console.log("not good");
+  }
+  console.log(typeof getQuantity);
+});
