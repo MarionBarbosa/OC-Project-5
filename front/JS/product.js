@@ -61,7 +61,7 @@ function addBasket(product, quantity) {
   if (foundProduct != undefined) {
     foundProduct.quantity = +foundProduct.quantity + +quantity;
   } else {
-    product.quantity = quantity;
+    product.quantity = +quantity;
     basket.push(product);
   }
 
