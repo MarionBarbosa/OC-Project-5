@@ -6,7 +6,9 @@ function getBasket() {
     return JSON.parse(basket);
   }
 }
-
+function saveBasket(basket) {
+  localStorage.setItem("basket", JSON.stringify(basket));
+}
 fetch(`http://localhost:3000/api/products`)
   .then(function (res) {
     if (res.ok) {
@@ -15,10 +17,12 @@ fetch(`http://localhost:3000/api/products`)
   })
   .then(function (productData) {
     const allQuantity = [];
-    const allPrice = [];
-    let basketContent = getBasket();
 
-    for (let product of basketContent) {
+    const allPrice = [];
+
+    let basket = getBasket();
+
+    for (let product of basket) {
       let id = product.id;
       let color = product.color;
       let qty = product.quantity;
@@ -79,7 +83,7 @@ fetch(`http://localhost:3000/api/products`)
       let newDivSettingsQuantityParagraph = document.createElement("p");
       newDivSettingsQuantityParagraph.textContent = "Qté : ";
       newDivSettingsQuantity.append(newDivSettingsQuantityParagraph);
-      //creating input for divSettingsQuantity - shows item qty, can be changed
+      //creating input for divSettingsQuantity - shows item qty
       let newInput = document.createElement("input");
       newInput.setAttribute("type", "number");
       newInput.setAttribute("name", "itemQuantity");
@@ -107,7 +111,7 @@ fetch(`http://localhost:3000/api/products`)
     }
     //adding total product quantity in webpage
     document.getElementById("totalQuantity").textContent = `${sumQuantity}`;
-    console.log(sumQuantity);
+
     //calculate total price for each product
     const totalPrice = [];
     for (let i = 0; i < Math.min(allQuantity.length, allPrice.length); i++) {
@@ -118,46 +122,139 @@ fetch(`http://localhost:3000/api/products`)
     for (let i = 0; i < totalPrice.length; i++) {
       sumFinalPrice += totalPrice[i];
     }
-    console.log(allQuantity);
-    console.log(allPrice);
-    console.log(totalPrice);
-    console.log(sumFinalPrice);
     //insert final price of basket in webpage
     document.getElementById("totalPrice").textContent = `${sumFinalPrice}`;
+
+    //-----EVENT-----
+    //deleting item by clicking "supprimer"
+    let deleteItem = document.querySelectorAll(".deleteItem");
+    for (let item of deleteItem) {
+      item.addEventListener("click", function removeFromBasket(e) {
+        let container = e.target.closest(".cart__item");
+        let containerDataId = container.dataset.id;
+        let containerDataColor = container.dataset.color;
+
+        //remove from DOM
+        container.remove();
+        // remove from localStorage
+        removeItem({
+          id: `${containerDataId}`,
+          color: `${containerDataColor}`,
+        });
+        let basket = getBasket();
+        const allQuantity = [];
+        const allPrice = [];
+
+        for (product of basket) {
+          let id = product.id;
+          let qty = product.quantity;
+          allQuantity.push(qty);
+          let foundProductId = productData.find((e) => e._id == id);
+          let price = foundProductId.price;
+          allPrice.push(price);
+        }
+
+        //calculate total product quantity in basket
+        let sumQuantity = 0;
+        for (let i = 0; i < allQuantity.length; i++) {
+          sumQuantity += allQuantity[i];
+        }
+        //adding total product quantity in webpage
+        document.getElementById("totalQuantity").textContent = `${sumQuantity}`;
+
+        //calculate total price for each product
+        const totalPrice = [];
+        for (
+          let i = 0;
+          i < Math.min(allQuantity.length, allPrice.length);
+          i++
+        ) {
+          totalPrice[i] = allQuantity[i] * allPrice[i];
+        }
+        //calculate total final price of basket
+        let sumFinalPrice = 0;
+        for (let i = 0; i < totalPrice.length; i++) {
+          sumFinalPrice += totalPrice[i];
+        }
+        //insert final price of basket in webpage
+        document.getElementById("totalPrice").textContent = `${sumFinalPrice}`;
+      });
+    }
+
+    //changing quantities in the input
+    let itemQuantity = document.querySelectorAll(".itemQuantity");
+
+    for (let quantity of itemQuantity) {
+      quantity.addEventListener("change", function changeQuantity(e) {
+        let newQuantity = e.target.value;
+        let container = e.target.closest(".cart__item");
+        let containerDataId = container.dataset.id;
+        let containerDataColor = container.dataset.color;
+        changeItemQuantity(
+          {
+            id: `${containerDataId}`,
+            color: `${containerDataColor}`,
+          },
+          `${newQuantity}`
+        );
+        let basket = getBasket();
+
+        const allQuantity = [];
+        const allPrice = [];
+
+        for (product of basket) {
+          let id = product.id;
+          let qty = product.quantity;
+          allQuantity.push(qty);
+          let foundProductId = productData.find((e) => e._id == id);
+          let price = foundProductId.price;
+          allPrice.push(price);
+        }
+
+        //calculate total product quantity in basket
+        let sumQuantity = 0;
+        for (let i = 0; i < allQuantity.length; i++) {
+          sumQuantity += allQuantity[i];
+        }
+        //adding total product quantity in webpage
+        document.getElementById("totalQuantity").textContent = `${sumQuantity}`;
+
+        //calculate total price for each product
+        const totalPrice = [];
+        for (
+          let i = 0;
+          i < Math.min(allQuantity.length, allPrice.length);
+          i++
+        ) {
+          totalPrice[i] = allQuantity[i] * allPrice[i];
+        }
+        //calculate total final price of basket
+        let sumFinalPrice = 0;
+        for (let i = 0; i < totalPrice.length; i++) {
+          sumFinalPrice += totalPrice[i];
+        }
+        //insert final price of basket in webpage
+        document.getElementById("totalPrice").textContent = `${sumFinalPrice}`;
+      });
+    }
   })
+
   .catch(function (err) {
     //une erreur est survenue
   });
-
-/*
-//Removing item from basket by clicking delete text
-let deleteItem = document.querySelector(
-  ".cart__item__content__settings__delete"
-);
-deleteItem.addEventListener("click", function removeFromBasket(product) {
+function removeItem(product) {
   let basket = getBasket();
-  basket = basket.filter((p) => p.id != product.id);
+  basket = basket.filter((p) => p.id != product.id || p.color != product.color);
   saveBasket(basket);
-});
-//changing the quantity of an item
-let itemQuantity = document.querySelector(".itemQuantity");
-itemQuantity.addEventListener(
-  "change",
-  function changeQuantity(product, quantity) {
-    let basket = getBasket();
-    let getQuantity = +itemQuantity.value;
-    if (getQuantity > 0) {
-      let foundProduct = basket.find((p) => p.id == product.id);
-      if (foundProduct != undefined) {
-        foundProduct.quantity == `${getQuantity}`;
-        saveBasket(basket);
-        console.log("change");
-      }
-    } else {
-      console.log("remove");
-    }
+}
 
-    saveBasket(basket);
+function changeItemQuantity(product, quantity) {
+  let basket = getBasket();
+  let foundProduct = basket.find(
+    (p) => p.id == product.id && p.color == product.color
+  );
+  if (foundProduct != undefined) {
+    foundProduct.quantity = +quantity;
   }
-);
-*/
+  saveBasket(basket);
+}
