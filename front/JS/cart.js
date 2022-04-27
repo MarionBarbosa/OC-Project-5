@@ -258,3 +258,56 @@ function changeItemQuantity(product, quantity) {
   }
   saveBasket(basket);
 }
+
+//*******FORM VALIDATION*********
+//regex
+let textRegex = new RegExp("^[A-Za-z-0-9À-ÖØ-öø-ÿ-,']+$", "g");
+let addressRegex = new RegExp("^[A-Za-z0-9À-ÖØ-öø-ÿ-,']+$", "g");
+let emailRegex = new RegExp(
+  "^[A-Za-z0-9'._-]+[@]{1}[A-Za-z0-9._-]+[.]{1}[a-z]{2,10}$",
+  "g"
+);
+
+function validInput(input, regex) {
+  let testInput = regex.test(input.value);
+  let p = input.nextElementSibling;
+  console.log(textRegex);
+  console.log(testInput);
+  console.log(input.value);
+  if (testInput) {
+    p.textContent = "Champ valide";
+    return true;
+  } else {
+    p.textContent = "Champ non valide";
+    return false;
+  }
+}
+//first name validation
+let firstName = document.getElementById("firstName");
+let inputFirstName = firstName.addEventListener("change", function () {
+  validInput(firstName, textRegex);
+});
+
+// last name validation
+let lastName = document.getElementById("lastName");
+let inputlastName = lastName.addEventListener("change", function () {
+  validInput(lastName, textRegex);
+});
+
+// address validation
+let address = document.getElementById("address");
+let inputAddress = address.addEventListener("change", function () {
+  validInput(address, addressRegex);
+});
+//validation city
+let city = document.getElementById("city");
+let inputCity = city.addEventListener("change", function () {
+  validInput(city, textRegex);
+});
+
+//validation email
+let email = document.getElementById("email");
+let inputEmail = email.addEventListener("change", function () {
+  validInput(email, emailRegex);
+});
+//*************sending form once validated**********
