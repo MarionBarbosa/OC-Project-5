@@ -302,7 +302,8 @@ let submitForm = submitBtn.addEventListener("click", function (e) {
     validInput(lastName, textRegex) &&
     validInput(address, addressRegex) &&
     validInput(city, textRegex) &&
-    validInput(email, emailRegex)
+    validInput(email, emailRegex) &&
+    localStorage.length > 0
   ) {
     contact = {
       firstName: firstName.value,
@@ -318,5 +319,7 @@ let submitForm = submitBtn.addEventListener("click", function (e) {
     }
     send();
     localStorage.clear();
+  } else if (localStorage.length < 1) {
+    alert("La commande a échoué car votre panier est vide.");
   }
 });
