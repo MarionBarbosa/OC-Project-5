@@ -17,7 +17,6 @@ fetch(`http://localhost:3000/api/products`)
   })
   .then(function (productData) {
     const allQuantity = [];
-
     const allPrice = [];
 
     let basket = getBasket();
@@ -261,11 +260,10 @@ function changeItemQuantity(product, quantity) {
 
 //*******FORM VALIDATION*********
 //regex
-let textRegex = new RegExp("^[A-Za-z-0-9À-ÖØ-öø-ÿ-,']+$", "g");
-let addressRegex = new RegExp("^[A-Za-z0-9À-ÖØ-öø-ÿ-,']+$", "g");
+let textRegex = new RegExp("^[A-Za-zÀ-ÖØ-öø-ÿ-' ]+$");
+let addressRegex = new RegExp("^[A-Za-z0-9À-ÖØ-öø-ÿ-,' ]+$");
 let emailRegex = new RegExp(
-  "^[A-Za-z0-9'._-]+[@]{1}[A-Za-z0-9._-]+[.]{1}[a-z]{2,10}$",
-  "g"
+  "^[A-Za-z0-9'._-]+[@]{1}[A-Za-z0-9._-]+[.]{1}[a-z]{2,10}$"
 );
 
 function validInput(input, regex) {
@@ -310,4 +308,61 @@ let email = document.getElementById("email");
 let inputEmail = email.addEventListener("change", function () {
   validInput(email, emailRegex);
 });
+
+//FUNCTION SENDING DATA TO API
+function send() {
+  fetch(`http://localhost:3000/api/products/order`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json;charset=UTF-8",
+    },
+    body: JSON.stringify({ contact, products }),
+  })
+    .then(function (res) {
+      if (res.ok) {
+        return res.json();
+      }
+    })
+    .then(function (json) {
+      console.log(json);
+      orderNumber = json.orderId;
+      console.log(orderNumber);
+      window.location.href = `./confirmation.html?orderId=${orderNumber}`;
+    })
+    .catch((err) => console.log(err));
+}
 //*************sending form once validated**********
+const products = [];
+let contact;
+let submitBtn = document.getElementById("order");
+let submitForm = submitBtn.addEventListener("click", function (e) {
+  e.preventDefault();
+  if (
+    validInput(firstName, textRegex) &&
+    validInput(lastName, textRegex) &&
+    validInput(address, addressRegex) &&
+    validInput(city, textRegex) &&
+    validInput(email, emailRegex)
+  ) {
+    contact = {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      address: address.value,
+      city: city.value,
+      email: email.value,
+    };
+    let basket = getBasket();
+    for (product of basket) {
+      let id = product.id;
+      products.push(id);
+    }
+    console.log(products);
+    console.log(contact);
+    send();
+    console.log(orderNumber);
+
+    //localStorage.clear();
+  } else {
+    console.log("l'un des champs n'est pas valide");
+  }
+});
