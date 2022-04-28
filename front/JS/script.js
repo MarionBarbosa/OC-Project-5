@@ -12,7 +12,7 @@ fetch(url)
   .catch(function (err) {
     alert("Une erreur est survenue lors du chargement de la page.");
   });
-
+//function to create HTML for each product
 function appendData(productData) {
   for (let product of productData) {
     let newLink = document.createElement("a");
