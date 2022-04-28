@@ -10,7 +10,7 @@ fetch(url)
   })
 
   .catch(function (err) {
-    //une erreur est survenue
+    alert("Une erreur est survenue lors du chargement de la page.");
   });
 
 function appendData(productData) {

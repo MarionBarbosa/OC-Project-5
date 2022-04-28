@@ -76,8 +76,6 @@ addToCart.addEventListener("click", function addToLocalStorage() {
   //Getting values for color and item qty
   let getColor = document.getElementById("colors").value;
   let getQuantity = +document.getElementById("quantity").value;
-
-  console.log(id, getColor, getQuantity);
   if (getColor != null && getQuantity > 0) {
     addBasket(
       {
@@ -87,7 +85,6 @@ addToCart.addEventListener("click", function addToLocalStorage() {
       `${getQuantity}`
     );
   } else {
-    console.log("not good");
+    alert("Veuillez sélectionner une couleur et une quantité.");
   }
-  console.log(typeof getQuantity);
 });
