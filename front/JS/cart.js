@@ -1,3 +1,4 @@
+//function to get the elements stored in the localStorage
 function getBasket() {
   let basket = localStorage.getItem("basket");
   if (basket == null) {
@@ -6,11 +7,13 @@ function getBasket() {
     return JSON.parse(basket);
   }
 }
+//function to save the new elements to the localStorage
 function saveBasket(basket) {
   localStorage.setItem("basket", JSON.stringify(basket));
 }
-let productList;
 
+let productList;
+//function to get element from basket and calculate totals
 function totalBasket() {
   let basket = getBasket();
   const allQuantity = [];
@@ -174,6 +177,7 @@ fetch(`http://localhost:3000/api/products`)
           id: `${containerDataId}`,
           color: `${containerDataColor}`,
         });
+        //recalculate totals
         totalBasket();
       });
     }
@@ -187,6 +191,7 @@ fetch(`http://localhost:3000/api/products`)
         let container = e.target.closest(".cart__item");
         let containerDataId = container.dataset.id;
         let containerDataColor = container.dataset.color;
+        //updates auqntity in localStorage
         changeItemQuantity(
           {
             id: `${containerDataId}`,
@@ -194,6 +199,7 @@ fetch(`http://localhost:3000/api/products`)
           },
           `${newQuantity}`
         );
+        //recalculates totals
         totalBasket();
       });
     }
@@ -202,12 +208,13 @@ fetch(`http://localhost:3000/api/products`)
   .catch(function (err) {
     alert("Une erreur est survenue.");
   });
+//function to remove an element from the localStorage
 function removeItem(product) {
   let basket = getBasket();
   basket = basket.filter((p) => p.id != product.id || p.color != product.color);
   saveBasket(basket);
 }
-
+//function to change to quantity of element in the localStorage
 function changeItemQuantity(product, quantity) {
   let basket = getBasket();
   let foundProduct = basket.find(
@@ -220,13 +227,13 @@ function changeItemQuantity(product, quantity) {
 }
 
 //*******FORM VALIDATION*********
-//regex
+//regex rules
 let textRegex = new RegExp("^[A-Za-zÀ-ÖØ-öø-ÿ-' ]+$");
 let addressRegex = new RegExp("^[A-Za-z0-9À-ÖØ-öø-ÿ-,' ]+$");
 let emailRegex = new RegExp(
   "^[A-Za-z0-9'._-]+[@]{1}[A-Za-z0-9._-]+[.]{1}[a-z]{2,10}$"
 );
-
+//function to test input and return result
 function validInput(input, regex) {
   let testInput = regex.test(input.value);
   let p = input.nextElementSibling;
@@ -282,6 +289,7 @@ function send() {
       }
     })
     .then(function (json) {
+      //getting orderId and inserting it in the URL
       orderNumber = json.orderId;
       window.location.href = `./confirmation.html?orderId=${orderNumber}`;
     })
@@ -292,8 +300,11 @@ function send() {
     );
 }
 //*************sending form once validated**********
+//creating an array that will contain all the ID from the localStorage
 const products = [];
+//creating object that will contain all customer's informations
 let contact;
+//listenin to event on submit button COMMANDER
 let submitBtn = document.getElementById("order");
 let submitForm = submitBtn.addEventListener("click", function (e) {
   e.preventDefault();
@@ -312,14 +323,18 @@ let submitForm = submitBtn.addEventListener("click", function (e) {
       city: city.value,
       email: email.value,
     };
-    let basket = getBasket();
-    for (product of basket) {
-      let id = product.id;
-      products.push(id);
-    }
+    getId();
     send();
     localStorage.clear();
   } else if (localStorage.length < 1) {
     alert("La commande a échoué car votre panier est vide.");
   }
 });
+//function that collects all the ID from localStorage and pushes them in an array
+function getId() {
+  let basket = getBasket();
+  for (product of basket) {
+    let id = product.id;
+    products.push(id);
+  }
+}
