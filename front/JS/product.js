@@ -39,10 +39,11 @@ fetch(`http://localhost:3000/api/products/${id}`)
     //une erreur est survenue
   });
 
-//functions for localStorage
+//function to save the new elements to the localStorage
 function saveBasket(basket) {
   localStorage.setItem("basket", JSON.stringify(basket));
 }
+//function to get the elements stored in the localStorage
 function getBasket() {
   let basket = localStorage.getItem("basket");
   if (basket == null) {
@@ -51,7 +52,7 @@ function getBasket() {
     return JSON.parse(basket);
   }
 }
-
+//function to add a new element to the localSstorage
 function addBasket(product, quantity) {
   let basket = getBasket();
   //increment quantity of product if product already in basket else add the product to the basket
@@ -64,11 +65,10 @@ function addBasket(product, quantity) {
     product.quantity = +quantity;
     basket.push(product);
   }
-
   saveBasket(basket);
 }
-//
-//Adding product to basket
+
+//*****Adding product to basket*****
 
 //adding product to localStorage on click event
 let addToCart = document.getElementById("addToCart");
