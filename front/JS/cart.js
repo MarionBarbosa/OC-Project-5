@@ -9,6 +9,40 @@ function getBasket() {
 function saveBasket(basket) {
   localStorage.setItem("basket", JSON.stringify(basket));
 }
+let productList;
+
+function totalBasket() {
+  let basket = getBasket();
+  const allQuantity = [];
+  const allPrice = [];
+  for (product of basket) {
+    let id = product.id;
+    let color = product.color;
+    let qty = product.quantity;
+    allQuantity.push(qty);
+    let foundProductId = productList.find((e) => e._id == id);
+    let price = foundProductId.price;
+    allPrice.push(price);
+  } //calculate total product quantity in basket
+  let sumQuantity = 0;
+  for (let i = 0; i < allQuantity.length; i++) {
+    sumQuantity += allQuantity[i];
+  } //adding total product quantity in webpage
+  document.getElementById("totalQuantity").textContent = `${sumQuantity}`;
+  //calculate total price for each product
+  const totalPrice = [];
+  for (let i = 0; i < Math.min(allQuantity.length, allPrice.length); i++) {
+    totalPrice[i] = allQuantity[i] * allPrice[i];
+  }
+  //calculate total final price of basket
+  let sumFinalPrice = 0;
+  for (let i = 0; i < totalPrice.length; i++) {
+    sumFinalPrice += totalPrice[i];
+  }
+  //insert final price of basket in webpage
+  document.getElementById("totalPrice").textContent = `${sumFinalPrice}`;
+}
+
 fetch(`http://localhost:3000/api/products`)
   .then(function (res) {
     if (res.ok) {
@@ -18,7 +52,7 @@ fetch(`http://localhost:3000/api/products`)
   .then(function (productData) {
     const allQuantity = [];
     const allPrice = [];
-
+    productList = productData;
     let basket = getBasket();
 
     for (let product of basket) {
@@ -26,11 +60,11 @@ fetch(`http://localhost:3000/api/products`)
       let color = product.color;
       let qty = product.quantity;
       allQuantity.push(qty);
-      let foundProductId = productData.find((e) => e._id == id);
+      let foundProductId = productList.find((e) => e._id == id);
       let price = foundProductId.price;
       allPrice.push(price);
 
-      //-----CREATE HTML----
+      //*******CREATE HTML********
       //create new article - product container
       let newArticle = document.createElement("article");
       newArticle.classList.add("cart__item");
@@ -140,43 +174,7 @@ fetch(`http://localhost:3000/api/products`)
           id: `${containerDataId}`,
           color: `${containerDataColor}`,
         });
-        let basket = getBasket();
-        const allQuantity = [];
-        const allPrice = [];
-
-        for (product of basket) {
-          let id = product.id;
-          let qty = product.quantity;
-          allQuantity.push(qty);
-          let foundProductId = productData.find((e) => e._id == id);
-          let price = foundProductId.price;
-          allPrice.push(price);
-        }
-
-        //calculate total product quantity in basket
-        let sumQuantity = 0;
-        for (let i = 0; i < allQuantity.length; i++) {
-          sumQuantity += allQuantity[i];
-        }
-        //adding total product quantity in webpage
-        document.getElementById("totalQuantity").textContent = `${sumQuantity}`;
-
-        //calculate total price for each product
-        const totalPrice = [];
-        for (
-          let i = 0;
-          i < Math.min(allQuantity.length, allPrice.length);
-          i++
-        ) {
-          totalPrice[i] = allQuantity[i] * allPrice[i];
-        }
-        //calculate total final price of basket
-        let sumFinalPrice = 0;
-        for (let i = 0; i < totalPrice.length; i++) {
-          sumFinalPrice += totalPrice[i];
-        }
-        //insert final price of basket in webpage
-        document.getElementById("totalPrice").textContent = `${sumFinalPrice}`;
+        totalBasket();
       });
     }
 
@@ -196,50 +194,13 @@ fetch(`http://localhost:3000/api/products`)
           },
           `${newQuantity}`
         );
-        let basket = getBasket();
-
-        const allQuantity = [];
-        const allPrice = [];
-
-        for (product of basket) {
-          let id = product.id;
-          let qty = product.quantity;
-          allQuantity.push(qty);
-          let foundProductId = productData.find((e) => e._id == id);
-          let price = foundProductId.price;
-          allPrice.push(price);
-        }
-
-        //calculate total product quantity in basket
-        let sumQuantity = 0;
-        for (let i = 0; i < allQuantity.length; i++) {
-          sumQuantity += allQuantity[i];
-        }
-        //adding total product quantity in webpage
-        document.getElementById("totalQuantity").textContent = `${sumQuantity}`;
-
-        //calculate total price for each product
-        const totalPrice = [];
-        for (
-          let i = 0;
-          i < Math.min(allQuantity.length, allPrice.length);
-          i++
-        ) {
-          totalPrice[i] = allQuantity[i] * allPrice[i];
-        }
-        //calculate total final price of basket
-        let sumFinalPrice = 0;
-        for (let i = 0; i < totalPrice.length; i++) {
-          sumFinalPrice += totalPrice[i];
-        }
-        //insert final price of basket in webpage
-        document.getElementById("totalPrice").textContent = `${sumFinalPrice}`;
+        totalBasket();
       });
     }
   })
 
   .catch(function (err) {
-    //une erreur est survenue
+    alert("Une erreur est survenue.");
   });
 function removeItem(product) {
   let basket = getBasket();
@@ -269,9 +230,6 @@ let emailRegex = new RegExp(
 function validInput(input, regex) {
   let testInput = regex.test(input.value);
   let p = input.nextElementSibling;
-  console.log(textRegex);
-  console.log(testInput);
-  console.log(input.value);
   if (testInput) {
     p.textContent = "Champ valide";
     return true;
@@ -324,12 +282,14 @@ function send() {
       }
     })
     .then(function (json) {
-      console.log(json);
       orderNumber = json.orderId;
-      console.log(orderNumber);
       window.location.href = `./confirmation.html?orderId=${orderNumber}`;
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      alert(
+        "Votre commande a échouée. Nous vous invitons à essayer une nouvelle fois."
+      )
+    );
 }
 //*************sending form once validated**********
 const products = [];
@@ -356,13 +316,7 @@ let submitForm = submitBtn.addEventListener("click", function (e) {
       let id = product.id;
       products.push(id);
     }
-    console.log(products);
-    console.log(contact);
     send();
-    console.log(orderNumber);
-
-    //localStorage.clear();
-  } else {
-    console.log("l'un des champs n'est pas valide");
+    localStorage.clear();
   }
 });
