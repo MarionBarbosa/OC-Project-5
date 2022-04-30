@@ -2,6 +2,26 @@
 let str = window.location.href;
 let url = new URL(str);
 let id = url.searchParams.get("id");
+//creating HTML and inserting data from API
+function createHTML(apiData) {
+  let newImg = document.createElement("img");
+  newImg.setAttribute("src", `${apiData.imageUrl}`);
+  newImg.setAttribute("alt", `${apiData.altTxt}`);
+  document.querySelector(".item__img").append(newImg);
+  //adding title text
+  document.querySelector("#title").innerText = `${apiData.name}`;
+  //adding item price
+  document.querySelector("#price").innerText = `${apiData.price}`;
+  //ading item description
+  document.querySelector("#description").innerText = `${apiData.description}`;
+  //create color options
+  for (let color of apiData.colors) {
+    let newOption = document.createElement("option");
+    newOption.setAttribute("value", `${color}`);
+    newOption.innerText = `${color}`;
+    document.querySelector("#colors").append(newOption);
+  }
+}
 
 //getting information from API with previously stored ID
 fetch(`http://localhost:3000/api/products/${id}`)
@@ -11,28 +31,8 @@ fetch(`http://localhost:3000/api/products/${id}`)
     }
   })
   .then(function (productData) {
-    //create image element and adding alt information
-    let newImg = document.createElement("img");
-    newImg.setAttribute("src", `${productData.imageUrl}`);
-    newImg.setAttribute("alt", `${productData.altTxt}`);
-    document.querySelector(".item__img").append(newImg);
-    //adding title text
-    document.querySelector("#title").innerText = `${productData.name}`;
-    //adding item price
-    document.querySelector("#price").innerText = `${productData.price}`;
-    //ading item description
-    document.querySelector(
-      "#description"
-    ).innerText = `${productData.description}`;
-
-    //define colors for the product
-    for (let color of productData.colors) {
-      //create new color option
-      let newOption = document.createElement("option");
-      newOption.setAttribute("value", `${color}`);
-      newOption.innerText = `${color}`;
-      document.querySelector("#colors").append(newOption);
-    }
+    //creating HTML and inserting data from API
+    createHTML(productData);
   })
 
   .catch(function (err) {

@@ -13,8 +13,8 @@ fetch(url)
     alert("Une erreur est survenue lors du chargement de la page.");
   });
 //function to create HTML for each product
-function appendData(productData) {
-  for (let product of productData) {
+function appendData(apiData) {
+  for (let product of apiData) {
     let newLink = document.createElement("a");
     newLink.setAttribute("href", `./product.html?id=${product._id}`);
     let newArticle = document.createElement("article");
