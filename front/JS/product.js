@@ -75,8 +75,9 @@ let addToCart = document.getElementById("addToCart");
 addToCart.addEventListener("click", function addToLocalStorage() {
   //Getting values for color and item qty
   let getColor = document.getElementById("colors").value;
+  console.log(getColor);
   let getQuantity = +document.getElementById("quantity").value;
-  if (getColor != null && getQuantity > 0) {
+  if (getColor !== "" && getQuantity > 0) {
     addBasket(
       {
         id: `${id}`,
