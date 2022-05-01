@@ -218,14 +218,21 @@ fetch(`http://localhost:3000/api/products`)
         let container = e.target.closest(".cart__item");
         let containerDataId = container.dataset.id;
         let containerDataColor = container.dataset.color;
+        if (newQuantity < 0 || newQuantity > 100) {
+          newQuantity = 0;
+        }
         //updates quantity in localStorage
-        changeItemQuantity(
-          {
-            id: `${containerDataId}`,
-            color: `${containerDataColor}`,
-          },
-          `${newQuantity}`
-        );
+        if (newQuantity > 0 && newQuantity <= 100) {
+          changeItemQuantity(
+            {
+              id: `${containerDataId}`,
+              color: `${containerDataColor}`,
+            },
+            `${newQuantity}`
+          );
+        } else {
+          alert("La quantité d'article doit être comprise entre 1 et 100.");
+        }
         //-----recalculates totals------
         const allQuantity = [];
         const allPrice = [];
@@ -354,5 +361,13 @@ let submitForm = submitBtn.addEventListener("click", function (e) {
     localStorage.clear();
   } else if (localStorage.length < 1) {
     alert("Votre panier est vide.");
+  } else if (
+    !validInput(firstName, textRegex) ||
+    !validInput(lastName, textRegex) ||
+    !validInput(address, addressRegex) ||
+    !validInput(city, textRegex) ||
+    !validInput(email, emailRegex)
+  ) {
+    alert("L'un des champs du formulaire n'est pas valide.");
   }
 });
