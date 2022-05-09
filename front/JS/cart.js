@@ -266,45 +266,50 @@ let addressRegex = new RegExp("^[A-Za-z0-9À-ÖØ-öø-ÿ-,' ]+$");
 let emailRegex = new RegExp(
   "^[A-Za-z0-9'._-]+[@]{1}[A-Za-z0-9._-]+[.]{1}[a-z]{2,10}$"
 );
+let alertMessageTextFalse = "Ce champ ne peut contenir que des lettres.";
+let alertMessageAddressFalse =
+  "Veuillez renseigner votre adresse selon le format '1 rue de l'exemple' .";
+let alertMessageEmailFalse = "Le format de ce champ est 'exemple@domaine.fr' .";
 //function to test input and return result
-function validInput(input, regex) {
+function validInput(input, regex, alertMessageFalse) {
   let testInput = regex.test(input.value);
   let p = input.nextElementSibling;
   if (testInput) {
-    p.textContent = "Champ valide";
+    p.textContent = "Champ valide.";
+    p.style.color = "#95FFCB";
     return true;
   } else {
-    p.textContent = "Champ non valide";
+    p.textContent = alertMessageFalse;
     return false;
   }
 }
 //first name validation
 let firstName = document.getElementById("firstName");
 let inputFirstName = firstName.addEventListener("change", function () {
-  validInput(firstName, textRegex);
+  validInput(firstName, textRegex, alertMessageTextFalse);
 });
 
 // last name validation
 let lastName = document.getElementById("lastName");
 let inputlastName = lastName.addEventListener("change", function () {
-  validInput(lastName, textRegex);
+  validInput(lastName, textRegex, alertMessageTextFalse);
 });
 
 // address validation
 let address = document.getElementById("address");
 let inputAddress = address.addEventListener("change", function () {
-  validInput(address, addressRegex);
+  validInput(address, addressRegex, alertMessageAddressFalse);
 });
 //validation city
 let city = document.getElementById("city");
 let inputCity = city.addEventListener("change", function () {
-  validInput(city, textRegex);
+  validInput(city, textRegex, alertMessageTextFalse);
 });
 
 //validation email
 let email = document.getElementById("email");
 let inputEmail = email.addEventListener("change", function () {
-  validInput(email, emailRegex);
+  validInput(email, emailRegex, alertMessageEmailFalse);
 });
 
 //FUNCTION SENDING DATA TO API
